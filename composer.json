@@ -1,0 +1,15 @@
+{
+    "name": "zenx5/organize-media-for-taxonomy",
+    "autoload": {
+        "psr-4": {
+            "Zenx5\\OrganizeMediaForTaxonomy\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Octavio Martinez",
+            "email": "omartinez1618@gmail.com"
+        }
+    ],
+    "require": {}
+}
