@@ -9,12 +9,10 @@
  * 
  */
 
-
 require 'vendor/autoload.php';
+
  
-register_activation_hook(__FILE__, ['OrganizeMedia','activation']);
-
-register_deactivation_hook(__FILE__, ['OrganizeMedia','deactivation']);
-
-add_action('init', ['OrganizeMedia','init']);
+register_activation_hook(__FILE__, ['OrganizerMedia','active']);
+register_activation_hook(__FILE__, ['OrganizerMedia','deactive']);
+add_action('init', ['OrganizerMedia','init']);
 

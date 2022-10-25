@@ -1,9 +1,9 @@
 {
     "name": "zenx5/organize-media-for-taxonomy",
     "autoload": {
-        "psr-4": {
-            "Zenx5\\OrganizeMediaForTaxonomy\\": "src/"
-        }
+        "files": [
+            "clases/class_organizer_media.php"
+        ]
     },
     "authors": [
         {
