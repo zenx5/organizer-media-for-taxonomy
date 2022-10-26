@@ -25,8 +25,8 @@ class OrganizerMedia {
     public static function get_media_data( ) {
         $result = [];
         $channel = curl_init();
-        curl_setopt($channel, CURLOPT_URL, 'http://bohiques.loc/wp-json/wp/v2/media');
-        //curl_setopt($channel, CURLOPT_SSL_VERIFYPEER, 1);
+        
+        curl_setopt($channel, CURLOPT_URL, str_replace("https://","http://",get_home_url()).'/wp-json/wp/v2/media');
         curl_setopt($channel, CURLOPT_RETURNTRANSFER, TRUE);
         $responseImages = curl_exec($channel);
         curl_close($channel);
