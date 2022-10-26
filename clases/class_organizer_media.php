@@ -17,7 +17,7 @@ class OrganizerMedia {
 
     public static function register_end_points( ) {
         register_rest_route( 'bohiques/v1', 'sliders', array(
-          'methods' => 'GET',
+          'methods' => 'get',
           'callback' => ['OrganizerMedia', 'get_media_data'],
         ) );
     }
@@ -31,7 +31,7 @@ class OrganizerMedia {
         $responseImages = curl_exec($channel);
         curl_close($channel);
         $images = json_decode( $responseImages );
-        $category = '';
+        $category = $_GET['client'];
 
 
         foreach($images as $image){
@@ -48,8 +48,18 @@ class OrganizerMedia {
         return $result;
     }
 
-    public static function is_category( $category, $categories_id ){
+    public static function is_category( $category_name, $categories_id ){
         return true;
+        $categories = get_terms( array(
+            'taxonomy' => 'category',
+            'hide_empty' => false,
+        ) );
+        foreach($categories as $category){
+            if( in_array($category->term_id, $categories_id ) && $category_name===$category->name ){
+                return true;
+            }
+        }
+        return false;
     }
 
     public static function get_tags($ids){
