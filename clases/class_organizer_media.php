@@ -41,7 +41,9 @@ class OrganizerMedia {
                     "type" => $image->media_type,
                     "src" => $image->source_url,
                     "orignal_tags" =>$image->tags,
-                    "tags" => self::get_tags( $image->tags)
+                    "tags" => self::get_tags( $image->tags),
+                    "original_categories" => $image->categories,
+                    "categories" => self::get_categories( $image->categories )
                ];
             }
         }
@@ -56,6 +58,20 @@ class OrganizerMedia {
         $result = [];
         $terms = get_terms( array(
             'taxonomy' => 'post_tag',
+            'hide_empty' => false,
+        ) );
+        foreach($terms as $term){
+            if( in_array($term->term_id, $ids, false )){
+                $result[] = $term->name;
+            }
+        }
+        return $result;
+    }
+
+    public static function get_categories($ids){
+        $result = [];
+        $terms = get_terms( array(
+            'taxonomy' => 'category',
             'hide_empty' => false,
         ) );
         foreach($terms as $term){
