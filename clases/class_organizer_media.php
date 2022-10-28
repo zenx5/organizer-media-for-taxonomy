@@ -103,9 +103,19 @@ class OrganizerMedia {
           'methods' => 'get',
           'callback' => ['OrganizerMedia', 'get_media_data'],
         ) );
+
+        register_rest_route( 'bohiques/v1', 'sliders', array(
+            'methods' => 'post',
+            'callback' => ['OrganizerMedia', 'get_media_data'],
+          ) );
+
+        register_rest_route( 'bohiques/v1', 'sliders/(?P<client>\d+)', array(
+            'methods' => 'get',
+            'callback' => ['OrganizerMedia', 'get_media_data'],
+        ) );
     }
 
-    public static function get_media_data( ) {
+    public static function get_media_data( $data ) {
         $result = [];
         $channel = curl_init();
         
@@ -114,7 +124,8 @@ class OrganizerMedia {
         $responseImages = curl_exec($channel);
         curl_close($channel);
         $images = json_decode( $responseImages );
-        $category_id = $_REQUEST['client'];
+        if( !isset( $data['client'] ) ) return array();
+        $category_id = $data['client'];
 
 
         foreach($images as $image){
