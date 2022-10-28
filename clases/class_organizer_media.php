@@ -11,8 +11,91 @@ class OrganizerMedia {
     public static function init(){
         add_action( 'rest_api_init', ['OrganizerMedia','register_end_points'] );
 
-        register_taxonomy_for_object_type( 'category', 'attachment' );
-        register_taxonomy_for_object_type( 'post_tag', 'attachment' );
+        
+        add_filter( 'manage_media_columns', ['OrganizerMedia', 'column_filter']);
+        //add_filter( 'get_term', ['OrganizerMedia', 'labels_category']);
+        self::register_attachment_taxonomy();
+        
+
+        add_action( 'add_meta_boxes_attachment', ['OrganizerMedia', 'metaboxes']);
+        add_action( 'admin_head', ['OrganizerMedia', 'insert_head'] );
+    }
+
+    public static function register_attachment_taxonomy(){
+        register_taxonomy( 'clients', ['attachment'], [
+            "labels" => [
+                "name" => __("Clients","organizer-media"),
+                "singular_name" => __("Client","organizer-media"),
+                "search_items" => __("Search Clients","organizer-media"),
+                "all_items" => __("All Clients","organizer-media"),
+                "parent_item" => __("Parent Client","organizer-media"),
+                "parent_item_colon" => __("Parent Client:","organizer-media"),
+                "edit_item" => __("Edit Client","organizer-media"),
+                "update_item" => __("Update Client","organizer-media"),
+                "add_new_item" => __("Add New Client","organizer-media"),
+                "new_item_name" => __("New Client Name","organizer-media"),
+                "menu_name" => __("Clients","organizer-media"),
+            ],
+            "description" => "",
+            "public" => true,
+            "publicly_queryable" => true, 
+            "hierarchical" => false,
+            "show_ui" => true,
+            "show_in_menu" => true,
+            "show_in_rest" => true,
+            "sort" => true,
+            "show_admin_column" => true,
+            "rest_namespace" => "bohiques/v1",
+            "rewrite" => array( 'slug' => 'client' ),
+        ] );
+
+        register_taxonomy( 'configuration', ['attachment'], [
+            "labels" => [
+                "name" => __("Configurations","organizer-media"),
+                "singular_name" => __("Configuration","organizer-media"),
+                "search_items" => __("Search Configurations","organizer-media"),
+                "all_items" => __("All Configurations","organizer-media"),
+                "parent_item" => __("Parent Configuration","organizer-media"),
+                "parent_item_colon" => __("Parent Configuration:","organizer-media"),
+                "edit_item" => __("Edit Configuration","organizer-media"),
+                "update_item" => __("Update Configuration","organizer-media"),
+                "add_new_item" => __("Add New Configuration","organizer-media"),
+                "new_item_name" => __("New Configuration Name","organizer-media"),
+                "menu_name" => __("Configurations","organizer-media"),
+            ],
+            "description" => "",
+            "public" => true,
+            "publicly_queryable" => true, 
+            "hierarchical" => false,
+            "show_ui" => true,
+            "show_in_menu" => true,
+            "show_in_rest" => true,
+            "show_admin_column" => true,
+            // "meta_box_cb" => function($item, $a){
+                // echo json_encode( $a );
+            // },
+            "rest_namespace" => "bohiques/v1",
+            "rewrite" => array( 'slug' => 'configuration' ),
+        ] );
+    }
+
+    public static function insert_head(){
+        ?>
+            <script src="<?= site_url(  ) . '/wp-content/plugins/organizer-media-for-taxonomy/templates/edit-clients.js'  ?>"></script>
+        <?php
+    }
+
+    public static function metaboxes( $columns ){
+        // add_meta_box( 'metabox_attachment', 'mi meta attachment', function(){
+        
+        // } );
+    }
+    
+    public static function column_filter( $columns ){
+        unset($columns['comments']);
+        //$columns['clients']='Clientes';
+        echo "<script>console.log(".json_encode($columns).")</script>";
+        return $columns;
     }
 
     public static function register_end_points( ) {
@@ -31,46 +114,32 @@ class OrganizerMedia {
         $responseImages = curl_exec($channel);
         curl_close($channel);
         $images = json_decode( $responseImages );
-        $category = $_GET['client'];
+        $category_id = $_REQUEST['client'];
 
 
         foreach($images as $image){
-            if( self::is_category( $category, $image->categories) ){
+            if( in_array( $category_id, $image->clients) ){
                 $result[]=[
+                    "id" => $image->id,
                     "title" => $image->title->rendered,
                     "type" => $image->media_type,
                     "src" => $image->source_url,
-                    "orignal_tags" =>$image->tags,
-                    "tags" => self::get_tags( $image->tags)
+                    "settings" => self::get_configurations( $image->configuration )
                ];
             }
         }
         return $result;
     }
 
-    public static function is_category( $category_name, $categories_id ){
-        return true;
-        $categories = get_terms( array(
-            'taxonomy' => 'category',
-            'hide_empty' => false,
-        ) );
-        foreach($categories as $category){
-            if( in_array($category->term_id, $categories_id ) && $category_name===$category->name ){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static function get_tags($ids){
+    public static function get_configurations($ids){
         $result = [];
         $terms = get_terms( array(
-            'taxonomy' => 'post_tag',
+            'taxonomy' => 'configuration',
             'hide_empty' => false,
         ) );
         foreach($terms as $term){
             if( in_array($term->term_id, $ids, false )){
-                $result[] = $term->name;
+                $result[$term->name] = json_decode( $term->description );
             }
         }
         return $result;
