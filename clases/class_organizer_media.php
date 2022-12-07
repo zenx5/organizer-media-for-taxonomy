@@ -99,13 +99,13 @@ class OrganizerMedia {
     }
 
     public static function register_end_points( ) {
-        register_rest_route( 'bohiques/v1', 'sliders', array(
+        register_rest_route( 'bohiques/v1', 'sliders/(?P<id>\d+)', array(
           'methods' => 'get',
           'callback' => ['OrganizerMedia', 'get_media_data'],
         ) );
     }
 
-    public static function get_media_data( ) {
+    public static function get_media_data( WP_REST_Request $request ) {
         $result = [];
         $channel = curl_init();
         
@@ -114,7 +114,7 @@ class OrganizerMedia {
         $responseImages = curl_exec($channel);
         curl_close($channel);
         $images = json_decode( $responseImages );
-        $category_id = $_REQUEST['client'];
+        $category_id = $request['id'];
 
 
         foreach($images as $image){
